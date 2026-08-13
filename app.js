@@ -212,8 +212,7 @@ function openExplorer(){
       </div>`).join("")}</div>`;
   const w = createWindow({title:"Проводник - База данных о", cls:"explorer", w:540, h:360, body, id:"explorer"});
   w.querySelectorAll(".file").forEach(f=>{
-    f.addEventListener("dblclick", ()=>openProject(PROJECTS.find(p=>p.id===f.dataset.id)));
-    f.addEventListener("click", ()=>f.classList.toggle("sel"));
+    f.addEventListener("click", ()=>openProject(PROJECTS.find(p=>p.id===f.dataset.id)));
   });
 }
 
@@ -268,8 +267,7 @@ startMenu.querySelectorAll("[data-open]").forEach(i=>{
   i.addEventListener("click", ()=>{ startMenu.hidden=true; openExplorer(); });
 });
 document.getElementById("icons").querySelectorAll(".icon").forEach(ic=>{
-  ic.addEventListener("click", ()=>{ document.querySelectorAll(".icon").forEach(x=>x.classList.remove("sel")); ic.classList.add("sel"); });
-  ic.addEventListener("dblclick", openExplorer);
+  ic.addEventListener("click", ()=>{ document.querySelectorAll(".icon").forEach(x=>x.classList.remove("sel")); ic.classList.add("sel"); openExplorer(); });
 });
 document.getElementById("smAbout").addEventListener("click", ()=>{
   startMenu.hidden=true;
@@ -280,5 +278,6 @@ function tick(){ const d=new Date(); document.getElementById("clock").textConten
   String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0"); }
 tick(); setInterval(tick, 10000);
 
-/* ---------- Старт: открываем Проводник ---------- */
-openExplorer();
+/* ---------- Старт: сразу открываем документ (минимум действий) ---------- */
+if (PROJECTS.length === 1) openProject(PROJECTS[0]);
+else openExplorer();

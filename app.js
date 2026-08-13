@@ -278,6 +278,5 @@ function tick(){ const d=new Date(); document.getElementById("clock").textConten
   String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0"); }
 tick(); setInterval(tick, 10000);
 
-/* ---------- Старт: сразу открываем документ (минимум действий) ---------- */
-if (PROJECTS.length === 1) openProject(PROJECTS[0]);
-else openExplorer();
+/* ---------- Старт: ничего не открываем автоматически ---------- */
+/* Только рабочий стол с папкой «База данных о». Открывается по клику. */

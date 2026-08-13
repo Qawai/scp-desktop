@@ -403,28 +403,81 @@ function openDbExplorer(){ openExplorerAt(DB_FOLDER, [COMPUTER, C_DRIVE, USER_FO
 function openComputer(){ openExplorerAt(COMPUTER, [COMPUTER]); }
 
 /* ---------- Игра «Змейка» ---------- */
+const SNAKE_DIFFS = [
+  {id:"easy",   name:"Лёгкая",    speed:160},
+  {id:"normal", name:"Нормальная",speed:120},
+  {id:"hard",   name:"Сложная",   speed:90},
+  {id:"xtreme", name:"Экстрим",   speed:60},
+];
+function snakeLoad(){ try{ return JSON.parse(localStorage.getItem("scp_snake")) || {}; }catch(e){ return {}; } }
+function snakeSave(s){ try{ localStorage.setItem("scp_snake", JSON.stringify(s)); }catch(e){} }
+
 function openSnake(){
   if(wins.has("snake")){ focusWindow(wins.get("snake")); return; }
   const body = `<div class="snake-wrap">
-      <div class="snake-score">Счёт: <span id="snakeScore">0</span></div>
-      <canvas id="snakeCanvas" width="300" height="220" class="snake-canvas"></canvas>
-      <div class="snake-hint">Стрелки — управление. Нажмите стрелку, чтобы начать. Esc — рестарт после проигрыша.</div>
+      <div class="snake-head">
+        <span class="snake-title">Змейка</span>
+        <span class="snake-best">Лучший счёт: <b id="snakeBest">0</b></span>
+      </div>
+      <div class="snake-stage">
+        <canvas id="snakeCanvas" width="300" height="220" class="snake-canvas"></canvas>
+        <div class="snake-start" id="snakeStart"></div>
+      </div>
     </div>`;
-  const w = createWindow({title:"Змейка", cls:"snake", w:340, h:330, body, id:"snake"});
+  const w = createWindow({title:"Змейка", cls:"snake", w:340, h:350, body, id:"snake"});
   const canvas = w.querySelector("#snakeCanvas");
   const ctx = canvas.getContext("2d");
-  const scoreEl = w.querySelector("#snakeScore");
-  const cell = 20, cols = canvas.width/cell, rows = canvas.height/cell;
-  let snake, dir, nextDir, food, score, timer = null, alive;
+  const bestEl = w.querySelector("#snakeBest");
+  const startEl = w.querySelector("#snakeStart");
+  const cell = 20, cols = canvas.width/cell, rows = canvas.height/cell, total = cols*rows;
+
+  let save = snakeLoad();
+  if(save.best == null) save.best = 0;
+  if(!save.won) save.won = [];
+  bestEl.textContent = save.best;
+
+  let snake, dir, nextDir, food, score, timer = null, raf = null, state = "start", selected = "easy";
+  const isUnlocked = i => i===0 || save.won.includes(SNAKE_DIFFS[i-1].id);
+  const speedOf = () => { const d = SNAKE_DIFFS.find(d=>d.id===selected); return d ? d.speed : 120; };
+
+  function renderDiffs(){
+    startEl.querySelector("#snakeDiffs").innerHTML = SNAKE_DIFFS.map((d,i)=>{
+      const un = isUnlocked(i);
+      const cls = "snake-diff" + (d.id===selected ? " sel" : "") + (un ? "" : " locked");
+      return `<div class="${cls}" data-id="${d.id}">${d.name}${un ? "" : " 🔒"}</div>`;
+    }).join("");
+    startEl.querySelectorAll(".snake-diff").forEach(el=>{
+      el.addEventListener("click", ()=>{ if(el.classList.contains("locked")) return; selected = el.dataset.id; renderDiffs(); });
+    });
+  }
+  function showStartScreen(){
+    if(raf){ cancelAnimationFrame(raf); raf = null; }
+    state = "start";
+    clearInterval(timer); timer = null;
+    const highest = SNAKE_DIFFS.reduce((a,d,i)=> isUnlocked(i) ? d.id : a, "easy");
+    if(!isUnlocked(SNAKE_DIFFS.findIndex(d=>d.id===selected))) selected = highest;
+    startEl.classList.remove("hidden");
+    startEl.innerHTML = `
+      <div class="snake-arrows">
+        <span class="ar up">↑</span><span class="ar left">←</span>
+        <span class="ar down">↓</span><span class="ar right">→</span>
+      </div>
+      <div class="snake-ctl">стрелки — для управления<br>Esc — начать игру</div>
+      <div class="snake-diffs" id="snakeDiffs"></div>
+      <button class="snake-play" id="snakePlay">Начать (Esc)</button>`;
+    renderDiffs();
+    startEl.querySelector("#snakePlay").addEventListener("click", startGame);
+  }
   function placeFood(){
-    while(true){
-      const f = {x:Math.floor(Math.random()*cols), y:Math.floor(Math.random()*rows)};
-      if(!snake.some(s=>s.x===f.x && s.y===f.y)){ food = f; break; }
-    }
+    const free = [];
+    for(let i=0;i<cols;i++) for(let j=0;j<rows;j++) if(!snake.some(s=>s.x===i&&s.y===j)) free.push({x:i,y:j});
+    if(free.length===0) return false;
+    food = free[Math.floor(Math.random()*free.length)];
+    return true;
   }
   function reset(){
     snake = [{x:5,y:5},{x:4,y:5},{x:3,y:5}];
-    dir = {x:1,y:0}; nextDir = dir; score = 0; alive = true; scoreEl.textContent = "0";
+    dir = {x:1,y:0}; nextDir = dir; score = 0;
     placeFood();
   }
   function draw(){
@@ -433,39 +486,85 @@ function openSnake(){
     for(let i=0;i<cols;i++) for(let j=0;j<rows;j++) if((i+j)%2) ctx.fillRect(i*cell,j*cell,cell,cell);
     ctx.fillStyle = "#ff5b5b"; ctx.fillRect(food.x*cell+3, food.y*cell+3, cell-6, cell-6);
     snake.forEach((s,i)=>{ ctx.fillStyle = i===0 ? "#aaffc0" : "#33ff66"; ctx.fillRect(s.x*cell+2, s.y*cell+2, cell-4, cell-4); });
-    if(!alive){
-      ctx.fillStyle = "rgba(0,0,0,.65)"; ctx.fillRect(0,0,canvas.width,canvas.height);
-      ctx.fillStyle = "#ff9b6b"; ctx.font = "15px monospace"; ctx.textAlign = "center";
-      ctx.fillText("Игра окончена", canvas.width/2, canvas.height/2 - 8);
-    }
+  }
+  function startGame(){
+    startEl.classList.add("hidden");
+    reset(); draw(); score = 0; state = "play";
+    clearInterval(timer); timer = setInterval(step, speedOf());
   }
   function step(){
     dir = nextDir;
     const head = {x:snake[0].x+dir.x, y:snake[0].y+dir.y};
-    if(head.x<0||head.x>=cols||head.y<0||head.y>=rows||snake.some(s=>s.x===head.x&&s.y===head.y)){
-      alive = false; clearInterval(timer); timer = null; draw(); return;
-    }
+    if(head.x<0||head.x>=cols||head.y<0||head.y>=rows||snake.some(s=>s.x===head.x&&s.y===head.y)){ gameOver(); return; }
     snake.unshift(head);
-    if(head.x===food.x && head.y===food.y){ score++; scoreEl.textContent = score; placeFood(); }
-    else snake.pop();
+    if(head.x===food.x && head.y===food.y){
+      score++;
+      if(snake.length === total){ win(); return; }
+      placeFood();
+    } else snake.pop();
     draw();
+  }
+  function updateBest(){
+    if(score > save.best){ save.best = score; bestEl.textContent = save.best; snakeSave(save); }
+  }
+  function gameOver(){
+    clearInterval(timer); timer = null; state = "over"; updateBest();
+    startEl.classList.remove("hidden");
+    startEl.innerHTML = `<div class="snake-result">Игра окончена</div>
+      <div class="snake-ctl">Счёт: ${score}<br>Esc — играть снова</div>
+      <button class="snake-play" id="snakePlay">Играть (Esc)</button>`;
+    startEl.querySelector("#snakePlay").addEventListener("click", showStartScreen);
+  }
+  function win(){
+    clearInterval(timer); timer = null; state = "win"; updateBest();
+    if(!save.won.includes(selected)){ save.won.push(selected); snakeSave(save); }
+    runConfetti();
+  }
+  function runConfetti(){
+    const parts = [];
+    const colors = ["#ff5b5b","#33ff66","#7fd0ff","#ffd86b","#ff9b6b","#c08bff"];
+    for(let i=0;i<140;i++) parts.push({x:Math.random()*canvas.width, y:Math.random()*-canvas.height, vx:(Math.random()-.5)*2, vy:Math.random()*3+2, c:colors[i%colors.length], s:Math.random()*4+3});
+    const t0 = performance.now();
+    function frame(){
+      ctx.fillStyle = "#04140a"; ctx.fillRect(0,0,canvas.width,canvas.height);
+      parts.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; if(p.y>canvas.height){ p.y=-10; p.x=Math.random()*canvas.width; } ctx.fillStyle=p.c; ctx.fillRect(p.x,p.y,p.s,p.s); });
+      ctx.fillStyle = "#aaffc0"; ctx.font = "bold 26px monospace"; ctx.textAlign = "center";
+      ctx.fillText("ПОБЕДА!", canvas.width/2, canvas.height/2);
+      if(performance.now()-t0 < 3500){ raf = requestAnimationFrame(frame); }
+      else {
+        draw();
+        const ni = SNAKE_DIFFS.findIndex(d=>d.id===selected)+1;
+        const openedNew = ni < SNAKE_DIFFS.length && isUnlocked(ni);
+        startEl.classList.remove("hidden");
+        startEl.innerHTML = `<div class="snake-result">ПОБЕДА!</div>
+          <div class="snake-ctl">Счёт: ${score}${openedNew ? "<br>Открыт новый уровень!" : ""}<br>Esc — играть снова</div>
+          <button class="snake-play" id="snakePlay">Играть (Esc)</button>`;
+        startEl.querySelector("#snakePlay").addEventListener("click", showStartScreen);
+      }
+    }
+    raf = requestAnimationFrame(frame);
   }
   function key(e){
     const k = e.key;
+    if(k==="Escape"){
+      if(state==="start") startGame();
+      else if(state==="over"||state==="win") showStartScreen();
+      e.preventDefault(); return;
+    }
+    if(state!=="play") return;
     if(k==="ArrowUp" && dir.y===0) nextDir = {x:0,y:-1};
     else if(k==="ArrowDown" && dir.y===0) nextDir = {x:0,y:1};
     else if(k==="ArrowLeft" && dir.x===0) nextDir = {x:-1,y:0};
     else if(k==="ArrowRight" && dir.x===0) nextDir = {x:1,y:0};
-    else if(k==="Escape"){ if(!alive){ if(timer) clearInterval(timer); timer=null; reset(); draw(); } }
     else return;
     e.preventDefault();
-    if(!timer && alive) timer = setInterval(step, 120);
   }
-  reset(); draw();
+  showStartScreen();
   const keyHandler = (e)=>key(e);
   document.addEventListener("keydown", keyHandler);
   w.querySelector('[data-act="close"]').addEventListener("click", ()=>{
     if(timer) clearInterval(timer);
+    if(raf) cancelAnimationFrame(raf);
     document.removeEventListener("keydown", keyHandler);
   });
 }

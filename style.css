@@ -109,15 +109,15 @@ body{
   display:flex;flex-direction:column;gap:14px;
 }
 .icon{
-  width:74px;text-align:center;color:#fff;cursor:pointer;
+  width:88px;text-align:center;color:#fff;cursor:pointer;
   text-shadow:1px 1px 1px #000;
 }
 .icon .icon-img{
-  width:34px;height:30px;margin:0 auto 3px;
+  width:46px;height:42px;margin:0 auto 3px;
   background:rgba(255,255,255,.15);
   border:1px solid #fff;
   display:flex;align-items:center;justify-content:center;
-  font-size:18px;
+  font-size:24px;
 }
 .icon-img.folder{background:linear-gradient(#ffe9a8,#e8b04b);border-color:#7a5a18;color:#5a3f0e;}
 .icon:active .icon-img{filter:brightness(.85);}
@@ -190,6 +190,7 @@ body{
   padding:6px 8px;cursor:pointer;
 }
 .sm-item .flag{width:16px;height:14px;border-radius:2px;background:linear-gradient(#f33,#f33) 0 0/8px 7px no-repeat,linear-gradient(#3c3,#3c3) 8px 0/8px 7px no-repeat,linear-gradient(#39f,#39f) 0 7px/8px 7px no-repeat,linear-gradient(#fc3,#fc3) 8px 7px/8px 7px no-repeat;}
+.sm-ico{width:20px;height:18px;display:inline-flex;align-items:center;justify-content:center;font-size:14px;flex:0 0 auto;}
 .sm-item:hover{background:var(--win-blue1);color:#fff;}
 .sm-sep{height:1px;background:var(--win-dark);border-bottom:1px solid #fff;margin:3px 2px;}
 
@@ -331,10 +332,24 @@ body{
 .power-btn.slide{transform:translateX(-300px);opacity:0;pointer-events:none;}
 
 /* ---------- Игра «Змейка» ---------- */
-.snake-wrap{padding:8px;font-family:monospace;color:#33ff66;background:#04140a;}
-.snake-score{margin-bottom:6px;font-size:13px;}
+.snake-wrap{padding:0;font-family:monospace;color:#33ff66;background:#04140a;display:flex;flex-direction:column;height:100%;}
+.snake-head{display:flex;justify-content:space-between;align-items:center;padding:5px 9px;background:#062;color:#aaffc0;font-size:13px;}
+.snake-best b{color:#ffd86b;}
+.snake-stage{position:relative;flex:1;display:flex;align-items:center;justify-content:center;}
 .snake-canvas{border:1px solid #33ff66;display:block;background:#04140a;image-rendering:pixelated;}
-.snake-hint{margin-top:6px;font-size:11px;color:#7fcf9f;line-height:1.4;}
+.snake-start{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:rgba(4,20,10,.94);color:#aaffc0;text-align:center;padding:12px;}
+.snake-start.hidden{display:none;}
+.snake-arrows{display:grid;grid-template-columns:repeat(3,22px);grid-template-rows:repeat(3,22px);gap:2px;justify-content:center;}
+.snake-arrows .ar{display:flex;align-items:center;justify-content:center;background:#063;color:#aaffc0;border:1px solid #0a3a1a;border-radius:3px;font-size:14px;}
+.snake-arrows .up{grid-area:1/2;} .snake-arrows .left{grid-area:2/1;} .snake-arrows .down{grid-area:2/2;} .snake-arrows .right{grid-area:2/3;}
+.snake-ctl{font-size:12px;line-height:1.5;}
+.snake-diffs{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;}
+.snake-diff{padding:4px 10px;font-size:12px;cursor:pointer;background:#04140a;color:#33ff66;border:1px solid #33ff66;border-radius:3px;}
+.snake-diff.sel{background:#33ff66;color:#04140a;font-weight:700;}
+.snake-diff.locked{opacity:.5;cursor:not-allowed;border-color:#555;color:#888;}
+.snake-play{margin-top:4px;padding:6px 16px;font-size:13px;font-weight:700;cursor:pointer;background:#33ff66;color:#04140a;border:none;border-radius:3px;font-family:monospace;}
+.snake-play:hover{filter:brightness(1.1);}
+.snake-result{font-size:20px;font-weight:700;color:#ffd86b;}
 .file .fname{font-size:11px;word-break:break-word;}
 .file:hover{border-color:#000080;background:#dbe6ff;}
 

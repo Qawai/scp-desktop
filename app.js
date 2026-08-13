@@ -469,45 +469,56 @@ document.getElementById("smAbout").addEventListener("click", ()=>{
     `<div style="padding:12px;font-family:monospace">SCP Terminal v.?.??.<br>Windows 98.<br></div>`});
 });
 
-/* ---------- Экран блокировки / выключение / перезагрузка ---------- */
+/* ---------- Экран блокировки / включение / выключение / перезагрузка ---------- */
 const lockScreen = document.getElementById("lockScreen");
 const lockUser = document.getElementById("lockUser");
 const lockEnter = document.getElementById("lockEnter");
-const shutdownScreen = document.getElementById("shutdownScreen");
-const sdMsg = document.getElementById("sdMsg");
+const powerScreen = document.getElementById("powerScreen");
+const powerMsg = document.getElementById("powerMsg");
 
 function closeAllWindows(){ [...wins.values()].forEach(w=>closeWindow(w)); }
-function showLockScreen(){
-  closeAllWindows();
-  shutdownScreen.hidden = true;
+function showLock(){
+  powerScreen.hidden = true;
   lockScreen.hidden = false;
   lockEnter.hidden = true;
+}
+function boot(){
+  closeAllWindows();
+  lockScreen.hidden = true;
+  powerScreen.hidden = false;
+  powerScreen.classList.remove("off");
+  powerMsg.textContent = "Включение…";
+  setTimeout(showLock, 1300);
 }
 lockUser.addEventListener("click", ()=>{ lockEnter.hidden = false; });
 lockEnter.addEventListener("click", ()=>{ lockScreen.hidden = true; });
 
-let powerReady = false;
 function doShutdown(){
   startMenu.hidden = true;
   closeAllWindows();
-  shutdownScreen.hidden = false;
-  powerReady = false;
-  sdMsg.textContent = "Завершение работы…";
+  powerScreen.hidden = false;
+  powerScreen.classList.remove("off");
+  powerMsg.textContent = "Завершение работы…";
   setTimeout(()=>{
-    sdMsg.textContent = "Можно выключать питание. Нажмите, чтобы включить.";
-    powerReady = true;
-  }, 1600);
+    powerScreen.classList.add("off");
+    powerMsg.textContent = "Выключено. Нажмите любую клавишу или кликните мышью, чтобы включить.";
+  }, 1300);
 }
-shutdownScreen.addEventListener("click", ()=>{ if(powerReady) showLockScreen(); });
 function doRestart(){
   startMenu.hidden = true;
-  shutdownScreen.hidden = false;
-  powerReady = false;
-  sdMsg.textContent = "Перезагрузка…";
-  setTimeout(()=>{ shutdownScreen.hidden = true; showLockScreen(); }, 1600);
+  closeAllWindows();
+  powerScreen.hidden = false;
+  powerScreen.classList.remove("off");
+  powerMsg.textContent = "Перезагрузка…";
+  setTimeout(boot, 1300);
 }
+powerScreen.addEventListener("click", ()=>{ if(powerScreen.classList.contains("off")) boot(); });
+document.addEventListener("keydown", ()=>{ if(!powerScreen.hidden && powerScreen.classList.contains("off")) boot(); });
 document.getElementById("smShutdown").addEventListener("click", doShutdown);
 document.getElementById("smRestart").addEventListener("click", doRestart);
+
+/* Запуск: экран включения → блокировка */
+boot();
 function tick(){ const d=new Date(); document.getElementById("clock").textContent =
   String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0"); }
 tick(); setInterval(tick, 10000);

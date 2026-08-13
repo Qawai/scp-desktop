@@ -42,18 +42,23 @@
       </div>
 
       <!-- Экран блокировки (перед запуском рабочего стола) -->
-      <div class="lockscreen" id="lockScreen">
-        <div class="lock-user" id="lockUser">
-          <div class="lock-avatar">🧑‍💻</div>
-          <div class="lock-name">user</div>
+      <div class="lockscreen" id="lockScreen" hidden>
+        <div class="lock-dialog">
+          <div class="lock-titlebar">Вход в систему</div>
+          <div class="lock-body">
+            <div class="lock-user" id="lockUser">
+              <div class="lock-avatar"></div>
+              <div class="lock-name">user</div>
+            </div>
+            <div class="lock-hint">Нажмите на пользователя</div>
+            <button class="lock-enter" id="lockEnter" hidden>Войти</button>
+          </div>
         </div>
-        <div class="lock-hint">Нажмите на пользователя</div>
-        <button class="lock-enter" id="lockEnter" hidden>Войти</button>
       </div>
 
-      <!-- Экран выключения / перезагрузки -->
-      <div class="shutdownscreen" id="shutdownScreen" hidden>
-        <div class="sd-msg" id="sdMsg">Завершение работы…</div>
+      <!-- Экран включения / выключения / перезагрузки -->
+      <div class="powerscreen" id="powerScreen" hidden>
+        <div class="power-msg" id="powerMsg">Включение…</div>
       </div>
 
       <!-- Эффекты «аналогового» экрана -->

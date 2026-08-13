@@ -18,10 +18,6 @@
             <div class="icon-img computer">🖥️</div>
             <span>Мой компьютер</span>
           </div>
-          <div class="icon" data-open="db">
-            <div class="icon-img folder"></div>
-            <span>База данных о</span>
-          </div>
         </div>
 
         <div class="taskbar" id="taskbar">
@@ -37,9 +33,27 @@
             <div class="sm-item" data-open="computer"><span class="flag"></span>Этот компьютер</div>
             <div class="sm-item" data-open="db"><span class="flag"></span>База данных о</div>
             <div class="sm-sep"></div>
+            <div class="sm-item" id="smRestart">⟳ Перезагрузка</div>
+            <div class="sm-item" id="smShutdown">⏻ Выключение</div>
+            <div class="sm-sep"></div>
             <div class="sm-item" id="smAbout">О системе…</div>
           </div>
         </div>
+      </div>
+
+      <!-- Экран блокировки (перед запуском рабочего стола) -->
+      <div class="lockscreen" id="lockScreen">
+        <div class="lock-user" id="lockUser">
+          <div class="lock-avatar">🧑‍💻</div>
+          <div class="lock-name">user</div>
+        </div>
+        <div class="lock-hint">Нажмите на пользователя</div>
+        <button class="lock-enter" id="lockEnter" hidden>Войти</button>
+      </div>
+
+      <!-- Экран выключения / перезагрузки -->
+      <div class="shutdownscreen" id="shutdownScreen" hidden>
+        <div class="sd-msg" id="sdMsg">Завершение работы…</div>
       </div>
 
       <!-- Эффекты «аналогового» экрана -->

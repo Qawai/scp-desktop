@@ -468,6 +468,46 @@ document.getElementById("smAbout").addEventListener("click", ()=>{
   createWindow({title:"О системе", w:320, h:180, body:
     `<div style="padding:12px;font-family:monospace">SCP Terminal v.?.??.<br>Windows 98.<br></div>`});
 });
+
+/* ---------- Экран блокировки / выключение / перезагрузка ---------- */
+const lockScreen = document.getElementById("lockScreen");
+const lockUser = document.getElementById("lockUser");
+const lockEnter = document.getElementById("lockEnter");
+const shutdownScreen = document.getElementById("shutdownScreen");
+const sdMsg = document.getElementById("sdMsg");
+
+function closeAllWindows(){ [...wins.values()].forEach(w=>closeWindow(w)); }
+function showLockScreen(){
+  closeAllWindows();
+  shutdownScreen.hidden = true;
+  lockScreen.hidden = false;
+  lockEnter.hidden = true;
+}
+lockUser.addEventListener("click", ()=>{ lockEnter.hidden = false; });
+lockEnter.addEventListener("click", ()=>{ lockScreen.hidden = true; });
+
+let powerReady = false;
+function doShutdown(){
+  startMenu.hidden = true;
+  closeAllWindows();
+  shutdownScreen.hidden = false;
+  powerReady = false;
+  sdMsg.textContent = "Завершение работы…";
+  setTimeout(()=>{
+    sdMsg.textContent = "Можно выключать питание. Нажмите, чтобы включить.";
+    powerReady = true;
+  }, 1600);
+}
+shutdownScreen.addEventListener("click", ()=>{ if(powerReady) showLockScreen(); });
+function doRestart(){
+  startMenu.hidden = true;
+  shutdownScreen.hidden = false;
+  powerReady = false;
+  sdMsg.textContent = "Перезагрузка…";
+  setTimeout(()=>{ shutdownScreen.hidden = true; showLockScreen(); }, 1600);
+}
+document.getElementById("smShutdown").addEventListener("click", doShutdown);
+document.getElementById("smRestart").addEventListener("click", doRestart);
 function tick(){ const d=new Date(); document.getElementById("clock").textContent =
   String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0"); }
 tick(); setInterval(tick, 10000);

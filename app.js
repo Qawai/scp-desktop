@@ -402,6 +402,74 @@ function openExplorerAt(node, path){
 function openDbExplorer(){ openExplorerAt(DB_FOLDER, [COMPUTER, C_DRIVE, USER_FOLDER, DB_FOLDER]); }
 function openComputer(){ openExplorerAt(COMPUTER, [COMPUTER]); }
 
+/* ---------- Игра «Змейка» ---------- */
+function openSnake(){
+  if(wins.has("snake")){ focusWindow(wins.get("snake")); return; }
+  const body = `<div class="snake-wrap">
+      <div class="snake-score">Счёт: <span id="snakeScore">0</span></div>
+      <canvas id="snakeCanvas" width="300" height="220" class="snake-canvas"></canvas>
+      <div class="snake-hint">Стрелки — управление. Нажмите стрелку, чтобы начать. Esc — рестарт после проигрыша.</div>
+    </div>`;
+  const w = createWindow({title:"Змейка", cls:"snake", w:340, h:330, body, id:"snake"});
+  const canvas = w.querySelector("#snakeCanvas");
+  const ctx = canvas.getContext("2d");
+  const scoreEl = w.querySelector("#snakeScore");
+  const cell = 20, cols = canvas.width/cell, rows = canvas.height/cell;
+  let snake, dir, nextDir, food, score, timer = null, alive;
+  function placeFood(){
+    while(true){
+      const f = {x:Math.floor(Math.random()*cols), y:Math.floor(Math.random()*rows)};
+      if(!snake.some(s=>s.x===f.x && s.y===f.y)){ food = f; break; }
+    }
+  }
+  function reset(){
+    snake = [{x:5,y:5},{x:4,y:5},{x:3,y:5}];
+    dir = {x:1,y:0}; nextDir = dir; score = 0; alive = true; scoreEl.textContent = "0";
+    placeFood();
+  }
+  function draw(){
+    ctx.fillStyle = "#04140a"; ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle = "#0a3a1a";
+    for(let i=0;i<cols;i++) for(let j=0;j<rows;j++) if((i+j)%2) ctx.fillRect(i*cell,j*cell,cell,cell);
+    ctx.fillStyle = "#ff5b5b"; ctx.fillRect(food.x*cell+3, food.y*cell+3, cell-6, cell-6);
+    snake.forEach((s,i)=>{ ctx.fillStyle = i===0 ? "#aaffc0" : "#33ff66"; ctx.fillRect(s.x*cell+2, s.y*cell+2, cell-4, cell-4); });
+    if(!alive){
+      ctx.fillStyle = "rgba(0,0,0,.65)"; ctx.fillRect(0,0,canvas.width,canvas.height);
+      ctx.fillStyle = "#ff9b6b"; ctx.font = "15px monospace"; ctx.textAlign = "center";
+      ctx.fillText("Игра окончена", canvas.width/2, canvas.height/2 - 8);
+    }
+  }
+  function step(){
+    dir = nextDir;
+    const head = {x:snake[0].x+dir.x, y:snake[0].y+dir.y};
+    if(head.x<0||head.x>=cols||head.y<0||head.y>=rows||snake.some(s=>s.x===head.x&&s.y===head.y)){
+      alive = false; clearInterval(timer); timer = null; draw(); return;
+    }
+    snake.unshift(head);
+    if(head.x===food.x && head.y===food.y){ score++; scoreEl.textContent = score; placeFood(); }
+    else snake.pop();
+    draw();
+  }
+  function key(e){
+    const k = e.key;
+    if(k==="ArrowUp" && dir.y===0) nextDir = {x:0,y:-1};
+    else if(k==="ArrowDown" && dir.y===0) nextDir = {x:0,y:1};
+    else if(k==="ArrowLeft" && dir.x===0) nextDir = {x:-1,y:0};
+    else if(k==="ArrowRight" && dir.x===0) nextDir = {x:1,y:0};
+    else if(k==="Escape"){ if(!alive){ if(timer) clearInterval(timer); timer=null; reset(); draw(); } }
+    else return;
+    e.preventDefault();
+    if(!timer && alive) timer = setInterval(step, 120);
+  }
+  reset(); draw();
+  const keyHandler = (e)=>key(e);
+  document.addEventListener("keydown", keyHandler);
+  w.querySelector('[data-act="close"]').addEventListener("click", ()=>{
+    if(timer) clearInterval(timer);
+    document.removeEventListener("keydown", keyHandler);
+  });
+}
+
 /* ---------- Шаблон проекта: SCP-терминал ---------- */
 function openProject(p){
   if(wins.has(p.id)){ focusWindow(wins.get(p.id)); return; }
@@ -468,6 +536,7 @@ document.getElementById("smAbout").addEventListener("click", ()=>{
   createWindow({title:"О системе", w:320, h:180, body:
     `<div style="padding:12px;font-family:monospace">SCP Terminal v.?.??.<br>Windows 98.<br></div>`});
 });
+document.getElementById("smSnake").addEventListener("click", ()=>{ startMenu.hidden=true; openSnake(); });
 
 /* ---------- Экран блокировки / включение / выключение / перезагрузка ---------- */
 const lockScreen = document.getElementById("lockScreen");
@@ -477,22 +546,46 @@ const powerScreen = document.getElementById("powerScreen");
 const powerMsg = document.getElementById("powerMsg");
 const powerBtn = document.getElementById("powerBtn");
 
+let booting = false;
 function closeAllWindows(){ [...wins.values()].forEach(w=>closeWindow(w)); }
 function showLock(){
   powerScreen.hidden = true;
   lockScreen.hidden = false;
   lockEnter.hidden = true;
 }
-function boot(){
+/* Чёрный экран выключенного ПК с кнопкой питания (красная) */
+function showPowerOff(){
   closeAllWindows();
+  booting = false;
   lockScreen.hidden = true;
-  powerMsg.hidden = false;
-  powerBtn.hidden = true;
+  powerMsg.hidden = true;
+  powerBtn.style.transition = "none";
+  powerBtn.className = "power-btn";
+  void powerBtn.offsetWidth;
+  powerBtn.style.transition = "";
+  powerBtn.hidden = false;
   powerScreen.hidden = false;
-  powerScreen.classList.remove("off");
-  powerMsg.textContent = "Включение…";
-  setTimeout(showLock, 1300);
+  powerScreen.classList.add("off");
 }
+/* Нажатие кнопки питания: синяя → уезжает → «Включение…» → блокировка */
+function startBoot(){
+  if(booting) return;
+  booting = true;
+  powerScreen.classList.remove("off");
+  powerBtn.classList.remove("pressed");
+  powerBtn.classList.add("on");
+  setTimeout(()=>{
+    powerBtn.classList.add("slide");
+    powerMsg.hidden = false;
+    powerMsg.textContent = "Включение…";
+  }, 1000);
+  setTimeout(showLock, 2300);
+}
+powerBtn.addEventListener("pointerdown", ()=> powerBtn.classList.add("pressed"));
+powerBtn.addEventListener("pointerup", ()=> powerBtn.classList.remove("pressed"));
+powerBtn.addEventListener("pointerleave", ()=> powerBtn.classList.remove("pressed"));
+powerBtn.addEventListener("click", ()=>{ if(powerScreen.classList.contains("off")) startBoot(); });
+
 lockUser.addEventListener("click", ()=>{ lockEnter.hidden = false; });
 lockEnter.addEventListener("click", ()=>{ lockScreen.hidden = true; });
 
@@ -504,11 +597,7 @@ function doShutdown(){
   powerScreen.hidden = false;
   powerScreen.classList.remove("off");
   powerMsg.textContent = "Завершение работы…";
-  setTimeout(()=>{
-    powerScreen.classList.add("off");
-    powerMsg.hidden = true;
-    powerBtn.hidden = false;
-  }, 1300);
+  setTimeout(showPowerOff, 1300);
 }
 function doRestart(){
   startMenu.hidden = true;
@@ -518,14 +607,13 @@ function doRestart(){
   powerScreen.hidden = false;
   powerScreen.classList.remove("off");
   powerMsg.textContent = "Перезагрузка…";
-  setTimeout(boot, 1300);
+  setTimeout(showPowerOff, 1300);
 }
-powerBtn.addEventListener("click", ()=>{ if(powerScreen.classList.contains("off")) boot(); });
 document.getElementById("smShutdown").addEventListener("click", doShutdown);
 document.getElementById("smRestart").addEventListener("click", doRestart);
 
-/* Запуск: экран включения → блокировка */
-boot();
+/* Запуск: экран выключенного ПК с кнопкой питания */
+showPowerOff();
 function tick(){ const d=new Date(); document.getElementById("clock").textContent =
   String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0"); }
 tick(); setInterval(tick, 10000);

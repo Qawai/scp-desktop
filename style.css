@@ -316,13 +316,25 @@ body{
 .powerscreen.off .power-msg{display:none;}
 .power-btn{
   width:84px;height:84px;border-radius:50%;font-size:38px;line-height:1;cursor:pointer;
-  background:radial-gradient(#1c3f7c,#0a1c3a);color:#7fd0ff;
-  border:3px solid #2a5cab;
-  box-shadow:0 0 18px rgba(60,140,255,.5), inset 0 0 12px rgba(0,0,0,.6);
+  background:radial-gradient(#1c3f7c,#0a1c3a);color:#ff6b6b;
+  border:3px solid #7a2a2a;
+  box-shadow:0 0 18px rgba(255,80,80,.55), inset 0 0 12px rgba(0,0,0,.6);
   display:flex;align-items:center;justify-content:center;
+  transition:transform .5s ease, box-shadow .25s ease, color .25s ease, border-color .25s ease;
 }
-.power-btn:hover{color:#bfe8ff;box-shadow:0 0 26px rgba(80,170,255,.85), inset 0 0 12px rgba(0,0,0,.6);}
-.power-btn:active{transform:scale(.96);}
+.power-btn.pressed{transition:transform .08s ease;transform:scale(.9);
+  box-shadow:0 0 10px rgba(255,80,80,.5), inset 0 0 14px rgba(0,0,0,.7);}
+.power-btn.on{
+  color:#7fd0ff;border-color:#2a5cab;
+  box-shadow:0 0 26px rgba(80,170,255,.85), inset 0 0 12px rgba(0,0,0,.6);
+}
+.power-btn.slide{transform:translateX(-300px);opacity:0;pointer-events:none;}
+
+/* ---------- Игра «Змейка» ---------- */
+.snake-wrap{padding:8px;font-family:monospace;color:#33ff66;background:#04140a;}
+.snake-score{margin-bottom:6px;font-size:13px;}
+.snake-canvas{border:1px solid #33ff66;display:block;background:#04140a;image-rendering:pixelated;}
+.snake-hint{margin-top:6px;font-size:11px;color:#7fcf9f;line-height:1.4;}
 .file .fname{font-size:11px;word-break:break-word;}
 .file:hover{border-color:#000080;background:#dbe6ff;}
 

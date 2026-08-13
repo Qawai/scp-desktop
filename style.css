@@ -240,6 +240,10 @@ body{
   flex:1;font-size:12px;padding:2px 4px;
   border:1px solid var(--win-dark);border-right-color:#fff;border-bottom-color:#fff;background:#fff;
 }
+.explorer .crumbbar{flex:1;font-size:12px;color:#000;overflow:hidden;white-space:nowrap;}
+.explorer .crumb{cursor:pointer;text-decoration:underline;}
+.explorer .crumb:hover{color:#000080;}
+.explorer .crumbbar .sep{color:var(--win-dark);margin:0 2px;}
 .filelist{
   display:flex;flex-wrap:wrap;gap:6px;padding:10px;align-content:flex-start;
 }
@@ -252,6 +256,13 @@ body{
   background:linear-gradient(#ffe9a8,#e8b04b);border:1px solid #7a5a18;color:#5a3f0e;
   display:flex;align-items:center;justify-content:center;font-size:20px;
 }
+.file[data-type="folder"] .fimg{
+  background:linear-gradient(#ffe9a8,#e8b04b);border-color:#7a5a18;color:#5a3f0e;
+}
+.file[data-type="scp"] .fimg{
+  background:linear-gradient(#eef3ff,#c9d6ff);border-color:#3a4a8a;color:#1a2a6a;
+}
+.icon-img.computer{background:linear-gradient(#dfe7ff,#9fb3e0);border-color:#3a4a8a;color:#1a2a6a;}
 .file .fname{font-size:11px;word-break:break-word;}
 .file:hover{border-color:#000080;background:#dbe6ff;}
 

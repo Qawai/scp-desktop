@@ -344,20 +344,63 @@ function createWindow({title, cls="", w=460, h=320, body="", id}){
   return el;
 }
 
-/* ---------- Проводник ---------- */
-function openExplorer(){
-  if(wins.has("explorer")){ focusWindow(wins.get("explorer")); return; }
-  const body = `<div class="addr"><span>Адрес:</span><input value="C:\\База данных о" readonly></div>
-    <div class="filelist">${PROJECTS.map(p=>`
-      <div class="file" data-id="${p.id}">
-        <div class="fimg">📄</div>
-        <div class="fname">${p.name}</div>
-      </div>`).join("")}</div>`;
-  const w = createWindow({title:"Проводник - База данных о", cls:"explorer", w:540, h:360, body, id:"explorer"});
-  w.querySelectorAll(".file").forEach(f=>{
-    f.addEventListener("click", ()=>openProject(PROJECTS.find(p=>p.id===f.dataset.id)));
-  });
+/* ---------- Виртуальная файловая система (для Проводника) ---------- */
+const DB_FOLDER = {
+  name:"База данных о", type:"folder", children:[
+    { name:"костюмы", type:"folder", children:[
+      { name:"K-1 — Техническое описание.txt", type:"scp", project:"k1" },
+      { name:"K-2 — Техническое описание.txt", type:"scp", project:"k2" }
+    ]}
+  ]
+};
+const USER_FOLDER = { name:"user", type:"folder", children:[DB_FOLDER] };
+const C_DRIVE     = { name:"Диск C:", type:"drive", children:[USER_FOLDER] };
+const COMPUTER    = { name:"Этот компьютер", type:"computer", children:[C_DRIVE] };
+
+/* ---------- Проводник (с навигацией по папкам) ---------- */
+function openExplorerAt(node, path){
+  if(wins.has("explorer")) closeWindow(wins.get("explorer"));
+  const crumbs = path.slice();
+  const body = `<div class="addr"><span>Адрес:</span><div class="crumbbar" id="crumbbar"></div></div>
+    <div class="filelist" id="filelist"></div>`;
+  const w = createWindow({title:"Проводник", cls:"explorer", w:540, h:360, body, id:"explorer"});
+  const crumbbar = w.querySelector("#crumbbar");
+  const filelist = w.querySelector("#filelist");
+  const cur = ()=> crumbs[crumbs.length-1];
+  function render(){
+    w.querySelector(".ttitle").textContent = "Проводник - " + cur().name;
+    crumbbar.innerHTML = crumbs.map((n,i)=>`<span class="crumb" data-i="${i}">${n.name}</span>`)
+      .join(` <span class="sep">\\</span> `);
+    crumbbar.querySelectorAll(".crumb").forEach(c=>{
+      c.addEventListener("click", ()=>{ crumbs.length = +c.dataset.i + 1; render(); });
+    });
+    const kids = cur().children || [];
+    filelist.innerHTML = kids.map(child=>{
+      if(child.type === "scp"){
+        const p = PROJECTS.find(x=>x.id===child.project);
+        return `<div class="file" data-type="scp" data-project="${child.project}">
+          <div class="fimg">📄</div><div class="fname">${p?p.name:child.name}</div></div>`;
+      }
+      const icon = child.type==="drive" ? "💽" : child.type==="computer" ? "🖥️" : "📁";
+      return `<div class="file" data-type="folder">
+        <div class="fimg">${icon}</div><div class="fname">${child.name}</div></div>`;
+    }).join("");
+    filelist.querySelectorAll(".file").forEach(f=>{
+      f.addEventListener("click", ()=>{
+        if(f.dataset.type === "scp"){
+          openProject(PROJECTS.find(p=>p.id===f.dataset.project));
+        }else{
+          const nm = f.querySelector(".fname").textContent;
+          const child = cur().children.find(c=>c.name===nm);
+          crumbs.push(child); render();
+        }
+      });
+    });
+  }
+  render();
 }
+function openDbExplorer(){ openExplorerAt(DB_FOLDER, [COMPUTER, C_DRIVE, USER_FOLDER, DB_FOLDER]); }
+function openComputer(){ openExplorerAt(COMPUTER, [COMPUTER]); }
 
 /* ---------- Шаблон проекта: SCP-терминал ---------- */
 function openProject(p){
@@ -407,10 +450,18 @@ document.getElementById("startBtn").addEventListener("click", e=>{
 });
 document.addEventListener("click", ()=>{ startMenu.hidden = true; });
 startMenu.querySelectorAll("[data-open]").forEach(i=>{
-  i.addEventListener("click", ()=>{ startMenu.hidden=true; openExplorer(); });
+  i.addEventListener("click", ()=>{
+    startMenu.hidden=true;
+    if(i.dataset.open==="computer") openComputer();
+    else openDbExplorer();
+  });
 });
 document.getElementById("icons").querySelectorAll(".icon").forEach(ic=>{
-  ic.addEventListener("click", ()=>{ document.querySelectorAll(".icon").forEach(x=>x.classList.remove("sel")); ic.classList.add("sel"); openExplorer(); });
+  ic.addEventListener("click", ()=>{
+    document.querySelectorAll(".icon").forEach(x=>x.classList.remove("sel")); ic.classList.add("sel");
+    if(ic.dataset.open==="computer") openComputer();
+    else openDbExplorer();
+  });
 });
 document.getElementById("smAbout").addEventListener("click", ()=>{
   startMenu.hidden=true;

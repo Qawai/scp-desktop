@@ -36,7 +36,7 @@ body{
 /* ---------- Монитор (фото) ---------- */
 .monitor{
   position:relative;
-  width:min(1180px, 98vw);
+  width:min(1180px, 98vw, 128vh);
   aspect-ratio:4 / 3;
   background:transparent;
   border-radius:12px;
@@ -196,7 +196,8 @@ body{
 /* ---------- Окно ---------- */
 .window{
   position:absolute;
-  min-width:300px;min-height:160px;
+  min-width:240px;min-height:140px;
+  max-width:calc(100% - 6px);
   background:var(--win-gray);
   border:1px solid #fff;
   border-right-color:var(--win-darker);

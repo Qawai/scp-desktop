@@ -139,7 +139,8 @@ function closeWindow(win){
 }
 function makeDraggable(win){
   const bar = win.querySelector(".titlebar");
-  bar.addEventListener("mousedown", e=>{
+  bar.style.touchAction = "none";
+  bar.addEventListener("pointerdown", e=>{
     if(e.target.closest(".ctrl")) return;
     focusWindow(win);
     const r = win.getBoundingClientRect();
@@ -152,18 +153,23 @@ function makeDraggable(win){
       y = Math.max(0, Math.min(y, s.height-30));
       win.style.left = x+"px"; win.style.top = y+"px";
     }
-    function up(){ document.removeEventListener("mousemove",move); document.removeEventListener("mouseup",up); }
-    document.addEventListener("mousemove",move);
-    document.addEventListener("mouseup",up);
+    function up(){ document.removeEventListener("pointermove",move); document.removeEventListener("pointerup",up); }
+    document.addEventListener("pointermove",move);
+    document.addEventListener("pointerup",up);
   });
 }
 function createWindow({title, cls="", w=460, h=320, body="", id}){
   const el = document.createElement("div");
   el.className = "window enter " + cls;
   el.dataset.id = id || ("w"+Date.now()+Math.floor(Math.random()*999));
-  el.style.width = w+"px"; el.style.height = h+"px";
-  el.style.left = (40 + wins.size*24)+"px";
-  el.style.top  = (20 + wins.size*24)+"px";
+  const maxW = desktop.clientWidth - 8;
+  const maxH = desktop.clientHeight - 30;
+  const cw = Math.max(240, Math.min(w, maxW));
+  const ch = Math.max(140, Math.min(h, maxH));
+  el.style.width = cw+"px"; el.style.height = ch+"px";
+  let L = 40 + wins.size*24; L = Math.min(L, maxW - cw); if(L < 4) L = 4;
+  let T = 20 + wins.size*24; T = Math.min(T, maxH - ch); if(T < 4) T = 4;
+  el.style.left = L+"px"; el.style.top = T+"px";
   el.innerHTML = `
     <div class="titlebar">
       <div class="ticon"></div>

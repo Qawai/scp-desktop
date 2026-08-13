@@ -270,6 +270,7 @@ body{
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
 }
 .lockscreen{background:radial-gradient(120% 120% at 50% 18%, #21508f, #0a1c3a 70%);color:#fff;}
+.lockscreen[hidden], .shutdownscreen[hidden]{display:none;}
 .lock-user{
   display:flex;flex-direction:column;align-items:center;gap:10px;cursor:pointer;
   padding:14px 28px;border:1px solid transparent;border-radius:6px;

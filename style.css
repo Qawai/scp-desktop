@@ -311,8 +311,18 @@ body{
 .lock-enter:active{box-shadow:none;transform:translate(1px,1px);}
 
 .powerscreen{background:#000;color:#cfcfcf;font-family:"Courier New",monospace;cursor:default;}
-.powerscreen.off{color:#5a5a5a;}
+.powerscreen.off{color:#5a5a5a;flex-direction:column;gap:18px;}
 .power-msg{font-size:16px;letter-spacing:1px;}
+.powerscreen.off .power-msg{display:none;}
+.power-btn{
+  width:84px;height:84px;border-radius:50%;font-size:38px;line-height:1;cursor:pointer;
+  background:radial-gradient(#1c3f7c,#0a1c3a);color:#7fd0ff;
+  border:3px solid #2a5cab;
+  box-shadow:0 0 18px rgba(60,140,255,.5), inset 0 0 12px rgba(0,0,0,.6);
+  display:flex;align-items:center;justify-content:center;
+}
+.power-btn:hover{color:#bfe8ff;box-shadow:0 0 26px rgba(80,170,255,.85), inset 0 0 12px rgba(0,0,0,.6);}
+.power-btn:active{transform:scale(.96);}
 .file .fname{font-size:11px;word-break:break-word;}
 .file:hover{border-color:#000080;background:#dbe6ff;}
 

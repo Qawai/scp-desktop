@@ -475,6 +475,7 @@ const lockUser = document.getElementById("lockUser");
 const lockEnter = document.getElementById("lockEnter");
 const powerScreen = document.getElementById("powerScreen");
 const powerMsg = document.getElementById("powerMsg");
+const powerBtn = document.getElementById("powerBtn");
 
 function closeAllWindows(){ [...wins.values()].forEach(w=>closeWindow(w)); }
 function showLock(){
@@ -485,6 +486,8 @@ function showLock(){
 function boot(){
   closeAllWindows();
   lockScreen.hidden = true;
+  powerMsg.hidden = false;
+  powerBtn.hidden = true;
   powerScreen.hidden = false;
   powerScreen.classList.remove("off");
   powerMsg.textContent = "Включение…";
@@ -496,24 +499,28 @@ lockEnter.addEventListener("click", ()=>{ lockScreen.hidden = true; });
 function doShutdown(){
   startMenu.hidden = true;
   closeAllWindows();
+  powerMsg.hidden = false;
+  powerBtn.hidden = true;
   powerScreen.hidden = false;
   powerScreen.classList.remove("off");
   powerMsg.textContent = "Завершение работы…";
   setTimeout(()=>{
     powerScreen.classList.add("off");
-    powerMsg.textContent = "Выключено. Нажмите любую клавишу или кликните мышью, чтобы включить.";
+    powerMsg.hidden = true;
+    powerBtn.hidden = false;
   }, 1300);
 }
 function doRestart(){
   startMenu.hidden = true;
   closeAllWindows();
+  powerMsg.hidden = false;
+  powerBtn.hidden = true;
   powerScreen.hidden = false;
   powerScreen.classList.remove("off");
   powerMsg.textContent = "Перезагрузка…";
   setTimeout(boot, 1300);
 }
-powerScreen.addEventListener("click", ()=>{ if(powerScreen.classList.contains("off")) boot(); });
-document.addEventListener("keydown", ()=>{ if(!powerScreen.hidden && powerScreen.classList.contains("off")) boot(); });
+powerBtn.addEventListener("click", ()=>{ if(powerScreen.classList.contains("off")) boot(); });
 document.getElementById("smShutdown").addEventListener("click", doShutdown);
 document.getElementById("smRestart").addEventListener("click", doRestart);
 

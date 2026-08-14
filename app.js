@@ -29,7 +29,7 @@ const PROJECTS = [
     id: "k1",
     name: "K-1 — Техническое описание.txt",
     type: "scp",
-    password: "K1-2024", /* ЗАМЕНИТЕ на свой пароль */
+    password: "4v4N64rD",
     tabs: [
       {
         title: "Вкладка 1",
@@ -141,7 +141,7 @@ const PROJECTS = [
     id: "k2",
     name: "K-2 — Техническое описание.txt",
     type: "scp",
-    password: "K2-2024", /* ЗАМЕНИТЕ на свой пароль */
+    password: "Ju663Rn4UT",
     tabs: [
       {
         title: "Вкладка 1",

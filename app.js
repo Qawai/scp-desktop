@@ -616,6 +616,7 @@ function openProject(p){
 }
 
 /* ---------- Запрос пароля к документу ---------- */
+let pwWin = null;
 function promptPassword(p){
   if(wins.has("pw_"+p.id)){ focusWindow(wins.get("pw_"+p.id)); return; }
   const body = `<div class="pw-box">
@@ -626,33 +627,32 @@ function promptPassword(p){
       <button class="pw-ok" id="pwOk">Открыть</button>
     </div>`;
   const w = createWindow({title:"Защита документа", w:300, h:230, body, id:"pw_"+p.id});
+  pwWin = w;
   const input = w.querySelector("#pwInput");
-  const err = w.querySelector("#pwErr");
   function tryOpen(){
-    if(input.value === p.password){ closeWindow(w); openProject(p); }
-    else { showAccessDenied(); input.value = ""; input.focus(); }
+    if(input.value === p.password){ closeWindow(w); pwWin = null; openProject(p); }
+    else { showAccessDenied(); }
   }
   w.querySelector("#pwOk").addEventListener("click", tryOpen);
   input.addEventListener("keydown", e=>{ if(e.key==="Enter") tryOpen(); });
   setTimeout(()=>input.focus(), 60);
 }
 
-/* ---------- Сообщение о блокировке доступа (на монитор) ---------- */
+/* ---------- Блокировка системы при неверном пароле ---------- */
 function showAccessDenied(){
   const screen = document.getElementById("screen");
   if(screen.querySelector(".access-denied")) return;
+  if(pwWin){ closeWindow(pwWin); pwWin = null; }
   const el = document.createElement("div");
   el.className = "access-denied";
   el.innerHTML = `<div class="ad-box">
       <div class="ad-title">ДОСТУП ЗАБЛОКИРОВАН</div>
       <div class="ad-text">ЭМОГ Альфа-1 «Red Right Hand» направляется к вашему местоположению.<br>Сопротивление бесполезно.</div>
-      <button class="ad-ok" id="adOk">Понятно</button>
+      <button class="ad-ok" id="adReboot">Перезагрузить систему</button>
     </div>`;
   screen.appendChild(el);
-  const close = ()=> el.remove();
-  el.querySelector("#adOk").addEventListener("click", close);
-  el.addEventListener("click", e=>{ if(e.target===el) close(); });
-  setTimeout(close, 7000);
+  document.getElementById("adReboot").addEventListener("click", ()=> location.reload());
+  screen.classList.add("locked");
 }
 
 /* ---------- Пуск / часы / иконки ---------- */

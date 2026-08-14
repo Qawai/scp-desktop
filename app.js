@@ -645,10 +645,11 @@ function showAccessDenied(){
   if(pwWin){ closeWindow(pwWin); pwWin = null; }
   const el = document.createElement("div");
   el.className = "access-denied";
-  el.innerHTML = `<div class="ad-box">
-      <div class="ad-title">ДОСТУП ЗАБЛОКИРОВАН</div>
-      <div class="ad-text">ЭМОГ Альфа-1 «Red Right Hand» направляется к вашему местоположению.<br>Сопротивление бесполезно.</div>
-      <button class="ad-ok" id="adReboot">Перезагрузить систему</button>
+  el.setAttribute("style","position:absolute;inset:0;z-index:5000;display:flex;align-items:center;justify-content:center;background:#2a0000;");
+  el.innerHTML = `<div style="text-align:center;font-family:'Courier New',monospace;max-width:92%;background:#140000;padding:30px 26px;border:2px solid #ff3b3b;">
+      <div style="color:#ffffff;font-size:28px;font-weight:700;letter-spacing:2px;margin-bottom:18px;">ДОСТУП ЗАБЛОКИРОВАН</div>
+      <div style="color:#ffe9e9;font-size:18px;line-height:1.8;margin-bottom:22px;">ЭМОГ Альфа-1 "Red Right Hand" направляется к вашему местоположению.<br>Сопротивление бесполезно.</div>
+      <button id="adReboot" style="padding:10px 26px;font-family:monospace;font-weight:700;cursor:pointer;background:#7a1010;color:#ffffff;border:2px solid #ff5b5b;border-radius:3px;">Перезагрузить систему</button>
     </div>`;
   screen.appendChild(el);
   document.getElementById("adReboot").addEventListener("click", ()=> location.reload());

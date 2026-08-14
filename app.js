@@ -630,11 +630,29 @@ function promptPassword(p){
   const err = w.querySelector("#pwErr");
   function tryOpen(){
     if(input.value === p.password){ closeWindow(w); openProject(p); }
-    else { err.textContent = "Неверный пароль. Доступ запрещён."; input.value = ""; }
+    else { showAccessDenied(); input.value = ""; input.focus(); }
   }
   w.querySelector("#pwOk").addEventListener("click", tryOpen);
   input.addEventListener("keydown", e=>{ if(e.key==="Enter") tryOpen(); });
   setTimeout(()=>input.focus(), 60);
+}
+
+/* ---------- Сообщение о блокировке доступа (на монитор) ---------- */
+function showAccessDenied(){
+  const screen = document.getElementById("screen");
+  if(screen.querySelector(".access-denied")) return;
+  const el = document.createElement("div");
+  el.className = "access-denied";
+  el.innerHTML = `<div class="ad-box">
+      <div class="ad-title">ДОСТУП ЗАБЛОКИРОВАН</div>
+      <div class="ad-text">ЭМОГ Альфа-1 «Red Right Hand» направляется к вашему местоположению.<br>Сопротивление бесполезно.</div>
+      <button class="ad-ok" id="adOk">Понятно</button>
+    </div>`;
+  screen.appendChild(el);
+  const close = ()=> el.remove();
+  el.querySelector("#adOk").addEventListener("click", close);
+  el.addEventListener("click", e=>{ if(e.target===el) close(); });
+  setTimeout(close, 7000);
 }
 
 /* ---------- Пуск / часы / иконки ---------- */

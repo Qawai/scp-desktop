@@ -6,10 +6,10 @@
 /* Единая анимация допуска (одинаковая для всех проектов) */
 const AUTH_SEQ = `
 <div class="seq">
-  <div class="seqline">Меметический агент деактивирован <span class="cursor"></span></div>
-  <div class="seqline">Биометрический профиль распознан.</div>
-  <div class="seqline">Уровень допуска подтверждён: 5 / Thaumiel.</div>
   <div class="seqline">ЭМОГ «Альфа-1» уведомлена об открытии сего документа.</div>
+  <div class="seqline">Уровень допуска подтверждён: 5 / Thaumiel.</div>
+  <div class="seqline">Биометрический профиль распознан.</div>
+  <div class="seqline">Меметический агент деактивирован <span class="cursor"></span></div>
   <div class="seqline">Часть сотрудников и наблюдателей уведомлены о доступе.</div>
   <div class="seqline">Раскрытие содержимого вышестоящим уровням влечёт необратимые последствия.</div>
   <div class="seqline">Все действия в документе мониторятся ИИ &#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;.</div>
@@ -29,6 +29,7 @@ const PROJECTS = [
     id: "k1",
     name: "K-1 — Техническое описание.txt",
     type: "scp",
+    password: "K1-2024", /* ЗАМЕНИТЕ на свой пароль */
     tabs: [
       {
         title: "Вкладка 1",
@@ -140,6 +141,7 @@ const PROJECTS = [
     id: "k2",
     name: "K-2 — Техническое описание.txt",
     type: "scp",
+    password: "K2-2024", /* ЗАМЕНИТЕ на свой пароль */
     tabs: [
       {
         title: "Вкладка 1",
@@ -388,7 +390,8 @@ function openExplorerAt(node, path){
     filelist.querySelectorAll(".file").forEach(f=>{
       f.addEventListener("click", ()=>{
         if(f.dataset.type === "scp"){
-          openProject(PROJECTS.find(p=>p.id===f.dataset.project));
+          const p = PROJECTS.find(x=>x.id===f.dataset.project);
+          if(p.password){ promptPassword(p); } else { openProject(p); }
         }else{
           const nm = f.querySelector(".fname").textContent;
           const child = cur().children.find(c=>c.name===nm);
@@ -588,6 +591,7 @@ function openProject(p){
   function showTab(i){
     tabbtns.forEach(b=>b.classList.toggle("active", +b.dataset.i===i));
     tabpanes.forEach(pn=>pn.classList.toggle("active", +pn.dataset.i===i));
+    scp.scrollTop = 0;
   }
   tabbtns.forEach(b=>b.addEventListener("click", ()=>{
     const i=+b.dataset.i;
@@ -602,12 +606,35 @@ function openProject(p){
   const confirm = scp.querySelector("[data-confirm]");
   confirm.addEventListener("click", ()=>{
     granted = true;
+    scp.scrollTop = 0;
     tabbtns.forEach(b=>b.classList.remove("locked"));
     showTab(1);
     const lines = scp.querySelectorAll(".seq .seqline");
     lines.forEach((l,idx)=>setTimeout(()=>l.classList.add("show"), 400*(idx+1)));
     setTimeout(()=>showTab(2), 400*(lines.length+2));
   });
+}
+
+/* ---------- Запрос пароля к документу ---------- */
+function promptPassword(p){
+  if(wins.has("pw_"+p.id)){ focusWindow(wins.get("pw_"+p.id)); return; }
+  const body = `<div class="pw-box">
+      <div class="pw-title">Доступ к документу</div>
+      <div class="pw-name">${p.name}</div>
+      <input class="pw-input" id="pwInput" type="password" placeholder="Введите пароль" autocomplete="off">
+      <div class="pw-err" id="pwErr"></div>
+      <button class="pw-ok" id="pwOk">Открыть</button>
+    </div>`;
+  const w = createWindow({title:"Защита документа", w:300, h:230, body, id:"pw_"+p.id});
+  const input = w.querySelector("#pwInput");
+  const err = w.querySelector("#pwErr");
+  function tryOpen(){
+    if(input.value === p.password){ closeWindow(w); openProject(p); }
+    else { err.textContent = "Неверный пароль. Доступ запрещён."; input.value = ""; }
+  }
+  w.querySelector("#pwOk").addEventListener("click", tryOpen);
+  input.addEventListener("keydown", e=>{ if(e.key==="Enter") tryOpen(); });
+  setTimeout(()=>input.focus(), 60);
 }
 
 /* ---------- Пуск / часы / иконки ---------- */

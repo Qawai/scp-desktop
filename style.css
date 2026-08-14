@@ -387,6 +387,15 @@ body{
 .scp img{max-width:100%;border:1px solid var(--term-green);margin:8px 0;display:block;filter:hue-rotate(70deg) saturate(.6);}
 .scp .lockmsg{color:#ff9b6b;}
 
+/* ---------- Запрос пароля ---------- */
+.pw-box{padding:14px;font-family:monospace;color:#33ff66;background:#04140a;display:flex;flex-direction:column;gap:8px;}
+.pw-title{font-weight:700;color:#aaffc0;font-size:14px;}
+.pw-name{font-size:12px;word-break:break-word;color:#7fcf9f;}
+.pw-input{padding:6px;font-family:monospace;background:#021;color:#33ff66;border:1px solid #33ff66;outline:none;}
+.pw-err{color:#ff9b6b;font-size:12px;min-height:14px;}
+.pw-ok{padding:6px;border:none;background:#33ff66;color:#04140a;font-weight:700;cursor:pointer;font-family:monospace;border-radius:3px;}
+.pw-ok:hover{filter:brightness(1.1);}
+
 /* Входная анимация окна */
 .window.enter{animation:winenter .35s ease;}
 @keyframes winenter{from{opacity:0;transform:scale(.96) translateY(-8px);}to{opacity:1;transform:none;}}

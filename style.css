@@ -316,20 +316,16 @@ body{
 .power-msg{font-size:16px;letter-spacing:1px;}
 .powerscreen.off .power-msg{display:none;}
 .power-btn{
-  width:84px;height:84px;border-radius:50%;font-size:38px;line-height:1;cursor:pointer;
-  background:radial-gradient(#1c3f7c,#0a1c3a);color:#ff6b6b;
-  border:3px solid #7a2a2a;
-  box-shadow:0 0 18px rgba(255,80,80,.55), inset 0 0 12px rgba(0,0,0,.6);
-  display:flex;align-items:center;justify-content:center;
-  transition:transform .5s ease, box-shadow .25s ease, color .25s ease, border-color .25s ease;
+  padding:12px 22px;cursor:pointer;
+  background:var(--win-gray);color:#000;font-weight:700;font-size:15px;
+  border:2px solid;border-color:#fff #404040 #404040 #fff;
+  box-shadow:1px 1px 0 #000;
+  display:inline-flex;align-items:center;gap:8px;
+  transition:transform .5s ease, box-shadow .15s ease, border-color .15s ease, background .15s ease;
 }
-.power-btn.pressed{transition:transform .08s ease;transform:scale(.9);
-  box-shadow:0 0 10px rgba(255,80,80,.5), inset 0 0 14px rgba(0,0,0,.7);}
-.power-btn.on{
-  color:#7fd0ff;border-color:#2a5cab;
-  box-shadow:0 0 26px rgba(80,170,255,.85), inset 0 0 12px rgba(0,0,0,.6);
-}
-.power-btn.slide{transform:translateX(-300px);opacity:0;pointer-events:none;}
+.power-btn.pressed{box-shadow:inset 1px 1px 0 #404040;border-color:#404040 #fff #fff #404040;}
+.power-btn.on{background:#1084d0;color:#fff;border-color:#0a1c3a;}
+.power-btn.slide{transform:translateX(-320px);opacity:0;pointer-events:none;}
 
 /* ---------- Игра «Змейка» ---------- */
 .snake-wrap{padding:0;font-family:monospace;color:#33ff66;background:#04140a;display:flex;flex-direction:column;height:100%;}
@@ -388,7 +384,8 @@ body{
 .scp .lockmsg{color:#ff9b6b;}
 
 /* ---------- Запрос пароля ---------- */
-.pw-box{padding:14px;font-family:monospace;color:#33ff66;background:#04140a;display:flex;flex-direction:column;gap:8px;}
+.pw-box{padding:14px;font-family:monospace;color:#33ff66;background:#04140a;display:flex;flex-direction:column;gap:8px;height:100%;}
+.about-box{height:100%;padding:12px;font-family:monospace;color:#000;background:var(--win-gray);}
 .pw-title{font-weight:700;color:#aaffc0;font-size:14px;}
 .pw-name{font-size:12px;word-break:break-word;color:#7fcf9f;}
 .pw-input{padding:6px;font-family:monospace;background:#021;color:#33ff66;border:1px solid #33ff66;outline:none;}

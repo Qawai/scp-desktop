@@ -678,7 +678,7 @@ document.getElementById("icons").querySelectorAll(".icon").forEach(ic=>{
 document.getElementById("smAbout").addEventListener("click", ()=>{
   startMenu.hidden=true;
   createWindow({title:"О системе", w:320, h:180, body:
-    `<div style="padding:12px;font-family:monospace">SCP Terminal v.?.??.<br>Windows 98.<br></div>`});
+    `<div class="about-box">SCP Terminal v.?.??.<br>Windows 98.<br></div>`});
 });
 document.getElementById("smSnake").addEventListener("click", ()=>{ startMenu.hidden=true; openSnake(); });
 

@@ -396,8 +396,8 @@ body{
 /* ---------- Блокировка системы при неверном пароле ---------- */
 .access-denied{position:absolute;inset:0;z-index:5000;display:flex;align-items:center;justify-content:center;background:#2a0000;cursor:not-allowed;}
 .ad-box{text-align:center;font-family:"Courier New",monospace;padding:30px 26px;max-width:92%;background:#140000;border:2px solid #ff3b3b;box-shadow:0 0 30px rgba(255,40,40,.5);}
-.ad-title{color:#fff;font-size:28px;font-weight:700;letter-spacing:3px;margin-bottom:18px;animation:adblink 1s steps(1) infinite;}
-.ad-text{color:#ffd2d2;font-size:17px;line-height:1.8;margin-bottom:24px;}
+.ad-title{color:#fff;font-size:30px;font-weight:700;letter-spacing:3px;margin-bottom:18px;animation:adblink 1s steps(1) infinite;text-shadow:0 0 12px rgba(255,255,255,.5);}
+.ad-text{color:#ffe9e9;font-size:19px;line-height:1.9;margin-bottom:24px;font-weight:700;}
 .ad-ok{padding:10px 26px;font-family:monospace;font-weight:700;cursor:pointer;background:#7a1010;color:#fff;border:2px solid #ff5b5b;border-radius:3px;}
 .ad-ok:hover{background:#9a1414;}
 @keyframes adblink{50%{opacity:.45;}}
